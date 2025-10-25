@@ -171,13 +171,13 @@ MySQL direct connection (host): `localhost:3307`
 - [x] Docker Compose setup
 - [x] Comprehensive README
 
-### 🚧 Phase 2: Business Logic (Next)
-- [ ] Payment service implementation
-- [ ] Validation and error handling
-- [ ] Retry logic with exponential backoff
-- [ ] Custom exceptions
+### 🚧 Phase 2: Business Logic
+- [x] Payment service implementation
+- [x] Validation and error handling
+- [x] Retry logic with exponential backoff
+- [x] Custom exceptions
 
-### 📅 Phase 3: Idempotency
+### 📅 Phase 3: Idempotency (Next)
 - [ ] Redis integration
 - [ ] Idempotency service
 - [ ] Duplicate payment prevention
