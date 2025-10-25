@@ -11,6 +11,15 @@ A scalable, production-grade payment processing microservice built with Spring B
 - ✅ Optimistic locking for concurrent safety
 - ✅ Flyway migrations for version-controlled schema
 
+## 🧾 Payment Gateway Status
+
+- ✅ Stripe: Fully configured and ready to use
+- ⏸️ Razorpay: Code structure ready, but currently inactive (awaiting API credentials). Disabled by default.
+
+How to enable Razorpay later:
+- Set `razorpay.enabled=true` in `src/main/resources/application.yml` (or via env/property)
+- Provide API keys: `razorpay.id` and `razorpay.secret`
+
 ## 🏗️ Architecture
 
 ### Current Implementation (Phase 1)
@@ -25,8 +34,6 @@ MySQL Database (8.0)
  - payments table                                
  - payment_events table (event sourcing)         
 
-
-text
 
 ## 🛠️ Tech Stack
 
@@ -54,10 +61,10 @@ cd PaymentService
 
 ### 2. Start MySQL with Docker Compose
 
-    docker-compose up
+    docker compose up -d
 
 This starts:
-- MySQL 8.0 on port 3306
+- MySQL 8.0 on host port 3307 (container port 3306)
 - phpMyAdmin on port 8081 (http://localhost:8081)
 
 ### 3. Configure Environment Variables
@@ -68,15 +75,15 @@ Edit .env with your actual credentials
 
 ### 4. Run Flyway Migrations
 
-    mvn flyway:migrate
+    ./mvnw flyway:migrate
 
 ### 5. Build the Project
 
-    mvn clean install
+    ./mvnw clean install
 
 ### 6. Run the Application
 
-    mvn spring-boot:run
+    ./mvnw spring-boot:run
 
 The application will start on `http://localhost:8080`
 
@@ -102,6 +109,8 @@ Access phpMyAdmin at http://localhost:8081
 - Server: mysql
 - Username: root
 - Password: password
+
+MySQL direct connection (host): `localhost:3307`
 
 ## 📈 Development Roadmap
 
