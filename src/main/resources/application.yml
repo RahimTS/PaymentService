@@ -46,6 +46,7 @@ spring:
 razorpay:
   id: ${RAZORPAY_KEY_ID:}
   secret: ${RAZORPAY_KEY_SECRET:}
+  enabled: false
 
 stripe:
   apikey: ${STRIPE_API_KEY:}
