@@ -3,10 +3,12 @@ package rahim.learning.paymentservices.config;
 import com.razorpay.RazorpayClient;
 import com.razorpay.RazorpayException;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
+@ConditionalOnProperty(prefix = "razorpay", name = "enabled", havingValue = "true", matchIfMissing = false)
 public class RazorpayConfig {
 
     @Value("${razorpay.id}")
