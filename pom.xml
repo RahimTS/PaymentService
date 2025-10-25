@@ -74,6 +74,13 @@
             <groupId>org.springframework.retry</groupId>
             <artifactId>spring-retry</artifactId>
         </dependency>
+
+        <!-- Load .env into Spring Environment at startup (dev convenience) -->
+        <dependency>
+            <groupId>me.paulschwarz</groupId>
+            <artifactId>spring-dotenv</artifactId>
+            <version>4.0.0</version>
+        </dependency>
         
         <!-- Flyway for DB migrations - NEW -->
         <dependency>
