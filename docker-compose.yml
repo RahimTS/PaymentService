@@ -10,7 +10,7 @@ services:
       MYSQL_USER: paymentuser
       MYSQL_PASSWORD: paymentpass
     ports:
-      - "3306:3306"
+      - "3307:3306"  # Expose MySQL on host port 3307 to avoid conflicts with local MySQL
     volumes:
       - mysql_data:/var/lib/mysql
     networks:
