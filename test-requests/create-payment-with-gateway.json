@@ -1,0 +1,10 @@
+{
+  "orderId": "ORD-002",
+  "amount": 149.99,
+  "currency": "USD",
+  "customerName": "Jane Smith",
+  "customerEmail": "jane@example.com",
+  "customerPhone": "+919876543211",
+  "gatewayType": "STRIPE",
+  "description": "Test payment with explicit gateway"
+}

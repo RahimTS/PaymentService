@@ -45,7 +45,57 @@ MySQL Database (8.0)
 - **Build Tool**: Maven
 - **Containerization**: Docker & Docker Compose
 
-## 📋 Prerequisites
+## � Configuration
+
+### Environment Variables Setup
+
+This project supports a `.env` file for local configuration. The application automatically loads variables from `.env` at startup (via spring-dotenv) for developer convenience. Do not commit real secrets.
+
+#### Step 1: Copy the example file
+
+```bash
+cp .env.example .env
+# On Windows PowerShell
+Copy-Item .env.example .env
+```
+
+#### Step 2: Configure Stripe API Keys
+
+1. Go to the Stripe Dashboard (test mode): https://dashboard.stripe.com/test/apikeys
+2. Copy your Secret Key (starts with `sk_test_`)
+3. Update `.env`:
+
+```env
+STRIPE_API_KEY=sk_test_your_actual_key_here
+```
+
+#### Step 3: Database Configuration (Docker defaults)
+
+The default values in `.env.example` work with the provided Docker Compose setup:
+
+```env
+DB_USERNAME=root
+DB_PASSWORD=password
+DB_HOST=localhost
+DB_PORT=3307   # Note: Using 3307 to avoid conflicts with local MySQL
+DB_NAME=payment_db
+```
+
+#### Step 4: Start the Application
+
+Start MySQL with Docker Compose:
+
+```bash
+docker compose up -d
+```
+
+Run the Spring Boot application (loads `.env` automatically):
+
+```bash
+./mvnw spring-boot:run
+```
+
+## �📋 Prerequisites
 
 - JDK 17 or higher
 - Maven 3.8+

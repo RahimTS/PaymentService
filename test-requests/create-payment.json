@@ -1,0 +1,9 @@
+{
+  "orderId": "ORD-001",
+  "amount": 99.99,
+  "currency": "USD",
+  "customerName": "John Doe",
+  "customerEmail": "john.doe@example.com",
+  "customerPhone": "+919876543210",
+  "description": "Test payment for order #001"
+}
