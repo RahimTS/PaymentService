@@ -5,9 +5,11 @@ import com.razorpay.RazorpayClient;
 import com.razorpay.RazorpayException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 @Component
+@ConditionalOnProperty(prefix = "razorpay", name = "enabled", havingValue = "true", matchIfMissing = false)
 public class RazorPaymentGateway implements IPaymentGateway {
 
     @Autowired

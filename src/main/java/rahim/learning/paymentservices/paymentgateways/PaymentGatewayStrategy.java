@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class PaymentGatewayStrategy {
 
-    @Autowired
+    @Autowired(required = false)
     private RazorPaymentGateway razorPaymentGateway;
 
     @Autowired

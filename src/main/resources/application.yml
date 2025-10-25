@@ -1,0 +1,70 @@
+spring:
+  application:
+    name: payment-service
+  
+  # Database Configuration
+  datasource:
+    url: jdbc:mysql://localhost:3307/payment_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD:password}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    
+    # HikariCP connection pool settings
+    hikari:
+      maximum-pool-size: 20
+      minimum-idle: 5
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+      pool-name: PaymentServiceHikariCP
+  
+  # JPA Configuration
+  jpa:
+    hibernate:
+      ddl-auto: none  # Flyway manages schema, disable Hibernate schema management
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+        format_sql: true
+        use_sql_comments: true
+        jdbc:
+          batch_size: 20
+          fetch_size: 50
+        order_inserts: true
+        order_updates: true
+    open-in-view: false
+  
+  # Flyway Configuration
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+    locations: classpath:db/migration
+    validate-on-migrate: true
+
+# Payment Gateway Configuration
+razorpay:
+  id: ${RAZORPAY_KEY_ID:}
+  secret: ${RAZORPAY_KEY_SECRET:}
+  enabled: false
+
+stripe:
+  apikey: ${STRIPE_API_KEY:}
+
+# Logging Configuration
+logging:
+  level:
+    root: INFO
+    rahim.learning.paymentservices: DEBUG
+    org.springframework.web: INFO
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+
+# Server Configuration
+server:
+  port: 8080
+  error:
+    include-message: always
+    include-binding-errors: always
