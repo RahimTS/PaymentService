@@ -1,6 +1,8 @@
 package rahim.learning.paymentservices.config;
 
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.jsontype.impl.LaissezFaireSubTypeValidator;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -67,10 +69,9 @@ public class RedisConfig {
         template.setKeySerializer(stringSerializer);
         template.setHashKeySerializer(stringSerializer);
         
-        // JSON serializer for values
-        ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.registerModule(new JavaTimeModule());
-        GenericJackson2JsonRedisSerializer jsonSerializer = 
+        // JSON serializer for values with type information to avoid LinkedHashMap casts
+        ObjectMapper objectMapper = buildRedisObjectMapper();
+        GenericJackson2JsonRedisSerializer jsonSerializer =
             new GenericJackson2JsonRedisSerializer(objectMapper);
         
         template.setValueSerializer(jsonSerializer);
@@ -84,10 +85,9 @@ public class RedisConfig {
 
     @Bean
     public CacheManager cacheManager(RedisConnectionFactory connectionFactory) {
-        // JSON serializer for cache values
-        ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.registerModule(new JavaTimeModule());
-        GenericJackson2JsonRedisSerializer jsonSerializer = 
+        // JSON serializer for cache values with type info
+        ObjectMapper objectMapper = buildRedisObjectMapper();
+        GenericJackson2JsonRedisSerializer jsonSerializer =
             new GenericJackson2JsonRedisSerializer(objectMapper);
         
         // Default cache configuration
@@ -161,5 +161,19 @@ public class RedisConfig {
                 log.warn("Cache CLEAR error on cache={}: {}", cache != null ? cache.getName() : "n/a", exception.getMessage());
             }
         };
+    }
+
+    /**
+     * Build an ObjectMapper configured for Redis serialization with JavaTime support
+     * and default typing so Spring Cache can deserialize to original types (e.g., PaymentResponseDto).
+     */
+    private ObjectMapper buildRedisObjectMapper() {
+        ObjectMapper om = new ObjectMapper();
+        om.registerModule(new JavaTimeModule());
+        // Include type info for non-final types so values de-serialize to their concrete classes
+        om.activateDefaultTyping(LaissezFaireSubTypeValidator.instance,
+                ObjectMapper.DefaultTyping.NON_FINAL,
+                JsonTypeInfo.As.PROPERTY);
+        return om;
     }
 }
