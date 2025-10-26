@@ -21,6 +21,34 @@ services:
       timeout: 5s
       retries: 5
 
+  redis:
+    image: redis:7-alpine
+    container_name: payment-service-redis
+    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD:-redispass}
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - payment-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "--raw", "incr", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  redis-commander:
+    image: rediscommander/redis-commander:latest
+    container_name: payment-service-redis-ui
+    environment:
+      REDIS_HOSTS: "local:redis:6379:0:${REDIS_PASSWORD:-redispass}"
+    ports:
+      - "8082:8081"
+    depends_on:
+      - redis
+    networks:
+      - payment-network
+
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
     container_name: payment-service-phpmyadmin
@@ -37,6 +65,7 @@ services:
 
 volumes:
   mysql_data:
+  redis_data:
 
 networks:
   payment-network:
