@@ -19,6 +19,7 @@ import rahim.learning.paymentservices.paymentgateways.IPaymentGateway;
 import rahim.learning.paymentservices.paymentgateways.PaymentGatewayStrategy;
 import rahim.learning.paymentservices.repositories.PaymentEventRepository;
 import rahim.learning.paymentservices.repositories.PaymentRepository;
+import rahim.learning.paymentservices.services.IdempotencyService;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -50,6 +51,9 @@ public class PaymentService implements IPaymentService {
     @Autowired
     private PaymentGatewayStrategy gatewayStrategy;
 
+    @Autowired
+    private IdempotencyService idempotencyService;
+
     private static final int MAX_RETRY_ATTEMPTS = 3;
     private static final int PAYMENT_LINK_EXPIRY_HOURS = 24;
 
@@ -62,7 +66,24 @@ public class PaymentService implements IPaymentService {
         // 1. Generate or use provided idempotency key
         String idempotencyKey = generateIdempotencyKey(requestDto);
 
-        // 2. Check for existing payment (idempotency)
+        // 2a. Fast-path idempotency using Redis (if previously processed)
+        if (idempotencyService.isProcessed(idempotencyKey)) {
+            String existingId = idempotencyService.getPaymentId(idempotencyKey);
+            if (existingId != null) {
+                try {
+                    UUID pid = UUID.fromString(existingId);
+                    Optional<Payment> byId = paymentRepository.findById(pid);
+                    if (byId.isPresent()) {
+                        log.info("Returning cached payment from Redis idempotency for key: {}", idempotencyKey);
+                        return mapToResponseDto(byId.get());
+                    }
+                } catch (IllegalArgumentException ignored) {
+                    // Fallback to DB lookup by idempotencyKey
+                }
+            }
+        }
+
+        // 2b. Check for existing payment in DB (idempotency)
         Optional<Payment> existingPayment = paymentRepository
                 .findByIdempotencyKey(idempotencyKey);
 
@@ -100,8 +121,11 @@ public class PaymentService implements IPaymentService {
             recordEvent(payment.getId(), "PAYMENT_LINK_CREATED",
                     "Payment link created successfully");
 
-            log.info("Payment created successfully. ID: {}, Order: {}",
+        log.info("Payment created successfully. ID: {}, Order: {}",
                     payment.getId(), payment.getOrderId());
+
+        // Mark idempotency key as processed in Redis for fast subsequent lookups
+        idempotencyService.markAsProcessed(idempotencyKey, payment.getId());
 
             return mapToResponseDto(payment);
 
