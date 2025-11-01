@@ -64,7 +64,11 @@ public class PaymentService implements IPaymentService {
 
     @Override
     @Transactional
-    @Cacheable(value = "payments", key = "#requestDto.idempotencyKey", unless = "#result == null")
+    @Cacheable(
+        value = "payments",
+        key = "#requestDto.idempotencyKey != null && #requestDto.idempotencyKey != '' ? #requestDto.idempotencyKey : #requestDto.orderId",
+        unless = "#result == null"
+    )
     public PaymentResponseDto createPayment(PaymentRequestDto requestDto) {
         log.info("Creating payment for order: {}", requestDto.getOrderId());
 
